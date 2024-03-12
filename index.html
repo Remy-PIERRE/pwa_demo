@@ -5,11 +5,122 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>PWA Demo</title>
 
+		<link rel="stylesheet" href="style/main.css" />
+
 		<link rel="manifest" href="./manifest.json" />
 	</head>
 	<body>
-		<h1>Hello PWA !</h1>
+		<header class="header--container">
+			<div class="header--wrapper">
+				<h1 class="header--title">PWA-FILMS</h1>
 
-		<script src="./scripts/app.js"></script>
+				<img
+					src="/images/ajouter.png"
+					alt="icone pour ajouter un film"
+					class="header--add" />
+			</div>
+		</header>
+
+		<main>
+			<section class="films--container">
+				<div class="films--wrapper" id="filmsContainer">
+					<template id="filmTemplate">
+						<div class="film--container">
+							<div class="film--wrapper">
+								<div class="film--info">
+									<h2 class="film--title"></h2>
+									<p class="film--type"></p>
+									<p class="film--duration"></p>
+								</div>
+
+								<div class="film--footer">
+									<div class="film--rating">
+										<img src="/images/star.png" alt="icone d'une étoile" />
+										<img src="/images/star.png" alt="icone d'une étoile" />
+										<img src="/images/star.png" alt="icone d'une étoile" />
+										<img src="/images/star.png" alt="icone d'une étoile" />
+										<img src="/images/star.png" alt="icone d'une étoile" />
+									</div>
+
+									<div class="film--edit">
+										<img
+											src="/images/editer.png"
+											alt="icone pour éditer le film" />
+									</div>
+
+									<div class="film--del">
+										<img
+											src="/images/poubelle.png"
+											alt="icone pour supprimer le film" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</template>
+
+					<!-- <div class="film--container">
+						<div class="film--wrapper">
+							<div class="film--info">
+								<h2 class="film--title">Titre</h2>
+								<p class="film--type">Genre : <span>S-F</span></p>
+								<p class="film--duration">Durée : <span>1h30</span></p>
+							</div>
+
+							<div class="film--footer">
+								<div class="film--rating">
+									<img src="/images/star.png" alt="icone d'une étoile" />
+									<img src="/images/star.png" alt="icone d'une étoile" />
+									<img src="/images/star.png" alt="icone d'une étoile" />
+									<img src="/images/star.png" alt="icone d'une étoile" />
+									<img src="/images/star.png" alt="icone d'une étoile" />
+								</div>
+
+								<div class="film--edit">
+									<img
+										src="/images/editer.png"
+										alt="icone pour éditer le film" />
+								</div>
+
+								<div class="film--del">
+									<img
+										src="/images/poubelle.png"
+										alt="icone pour supprimer le film" />
+								</div>
+							</div>
+						</div>
+					</div> -->
+				</div>
+			</section>
+		</main>
+
+		<script type="module" src="./scripts/app.js"></script>
+		<script type="module" src="./scripts/db.js"></script>
+
+		<script>
+			//
+
+			// document.querySelector("#test").addEventListener("click", async () => {
+			// 	try {
+			// 		const response = await fetch(
+			// 			"https://pkcontact-65917-default-rtdb.europe-west1.firebasedatabase.app/films/2.json",
+			// 			{
+			// 				method: "PUT",
+			// 				body: JSON.stringify({
+			// 					title: "Dune",
+			// 					type: "Science fiction",
+			// 					duration: "1h30",
+			// 				}),
+			// 			}
+			// 		);
+			// 		// const response = await fetch(
+			// 		// 	"https://pkcontact-65917-default-rtdb.europe-west1.firebasedatabase.app/user.json"
+			// 		// );
+			// 		const data = await response.json();
+			// 		console.log("data : ", data);
+			// 	} catch (error) {
+			// 		console.log("Error : ", error.message);
+			// 	}
+			// });
+		</script>
 	</body>
 </html>
