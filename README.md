@@ -393,6 +393,16 @@ Si ma requête à bien été stoquée en cache précédement, je peux maintenant
 
 ![Les films sont affichés même hors ligne](/images/app_affichage_films_hors_ligne.png)
 
+### Stoquer les modifications hors ligne
+
+Le cache ne peut enregistrer de requêtes de type "PUT" ou "DELETE". Il faudra utiliser une autre méthode.
+
+Firebase propose dans ses services la persistance des données. Il faut faudra configurer l'application et utiliser les bibliothèques inhérentes à Firebase pour mettre cela en place.
+Documentation : [Firebase et perrsistance des données hors ligne](https://firebase.google.com/docs/firestore/manage-data/enable-offline?hl=fr)
+
+Une autre méthode repose sur l'utilisation de L'API IndexDB pour persister vos données hors ligne et pouvoir ensuite transférer ces modifications vers votre base de donnée lorsque la connection sera revenue.
+Documentation : [IndexDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
+
 ## Notifications
 
 L'envoie de notifications vers le client est aisée.
