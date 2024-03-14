@@ -101,11 +101,42 @@ self.addEventListener("fetch", async (event) => {
 		}
 	};
 
+	// const addFilms = async () => {
+	// 	const cache = await caches.open("films");
+
+	// 	try {
+	// 		const response = await fetch(event.request);
+
+	// 		if (!response.ok) throw new Error();
+
+	// 		console.log("Réussite de l'envoie des données !");
+	// 		return response;
+	// 	} catch (error) {
+	// 		console.log("Echec de l'envoie des données !");
+	// 		cache.add(event.request);
+	// 		return new Response();
+	// 	}
+	// };
+
 	// on intercèpte une requête ciblée (ici vers la BDD) //
-	if (event.request.url.includes("/films.json")) {
+	if (
+		event.request.url.includes("/films.json") &&
+		event.request.method === "GET"
+	) {
 		return event.respondWith(fetchFilms());
 	}
 
+	// if (event.request.url.includes("/films/") && event.request.method === "PUT") {
+	// 	return event.respondWith(addFilms());
+	// }
+
 	// event.respondWith() permet d'intercépter les requêtes et d'émettre une réponse personnalisée si besoin //
 	event.respondWith(fetchInterception());
+});
+
+// on intercepte la notification pish envoyée depuis le serveur //
+self.addEventListener("push", (event) => {
+	const data = event.data ? event.data.json() : {};
+	// on emet une notification en fonction des données reçues //
+	event.waitUntil(self.registration.showNotification(data.title, data));
 });

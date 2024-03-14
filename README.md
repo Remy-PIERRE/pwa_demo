@@ -34,13 +34,13 @@ Documentation : [Manifest](https://developer.mozilla.org/fr/docs/Mozilla/Add-ons
 - les données sont au format json
 - les pages HTML l'utilisant doivent le charger gràce à l'utilisation d'une balise :
 
-index.html :
+<code>index.html</code>
 
 ```html
 <link rel="manifest" src="manifest.json" />
 ```
 
-manifest.json :
+<code>manifest.json</code>
 
 ```json
 {
@@ -104,7 +104,7 @@ Documentation : [Service worker](https://developer.mozilla.org/fr/docs/Web/API/S
 
 Certaines plateformes ou navigateurs ne sont pas compatibles avec l'utilisation de service worker, il convient donc de vérifier si l'installation de ce dernier est possible :
 
-app.js :
+<code>app.js</code>
 
 ```js
 // on vérifie si le service est supporté ... //
@@ -144,7 +144,7 @@ Si une autre version du service worker est déjà installée, la nouvelle versio
 
 On peut capter les évenements "install" et "activate" depuis le service worker :
 
-sw.js :
+<code>sw.js</code>
 
 ```js
 self.addEventListener("install", () => {
@@ -292,7 +292,7 @@ Il faudra veiller à utiliser une url valide correspondant à votre environnemen
 
 Depuis le service worker, nous allons intercépter la requête faite par l'application depuis le block eventListener : "fetch", puis nous stoquerons la réponse dans le cache.
 
-sw.js :
+<code>sw.js</code>
 
 ```js
 self.addEventListener("fetch", async (event) => {
@@ -352,7 +352,7 @@ Firebase propose des outils qui permettent de vérifier si la base de données �
 
 Nous mettrons en place donc une solution "DB first" : le cache ne sera utiilisé pour nos données "film" uniquement si la base de données n'est pas accessible.
 
-sw.js :
+<code>sw.js</code>
 
 ```js
 self.addEventListener("fetch", async (event) => {
@@ -392,3 +392,141 @@ self.addEventListener("fetch", async (event) => {
 Si ma requête à bien été stoquée en cache précédement, je peux maintenant accéder à ma liste de films en étant hors ligne !
 
 ![Les films sont affichés même hors ligne](/images/app_affichage_films_hors_ligne.png)
+
+## Notifications
+
+L'envoie de notifications vers le client est aisée.
+
+J'ajoute un bouton pour activer les notifications :
+
+```html
+<div class="header--buttons">
+	<img
+		src="/images/notification.png"
+		alt="icone pour activer les notifications"
+		class="header--notif"
+		id="notifications" />
+	<img
+		src="/images/ajouter.png"
+		alt="icone pour ajouter un film"
+		class="header--add"
+		id="addFilmButton" />
+</div>
+```
+
+Je créé le fichier <code>notif.js</code> dans lequel je vérifie si les notifications sont bien prises en compte par le navigateur actuel et si l'utilisateur accèpte de recevoir ces dernières :
+
+```js
+// on attend que le client click sur le bouton de notification //
+const button = document.querySelector("#notifications");
+button.addEventListener("click", async () => {
+	// on vérifie que le client puisse gérer les notifications //
+	if (!"Notification" in window) {
+		alert("Ce navigateur ne prend pas en compte les notifications !");
+	}
+
+	// si les notifications sont activées, on peut directement en envoyer une pour tester //
+	else if (Notification.permission === "granted") {
+		const notification = new Notification("Ceci est une notification !");
+	}
+
+	// si l'utilisateur à déjà parétré son refus //
+	else if (Notification.permission === "denied") {
+		alert("Les notifications ne sont pas autorisées sur ce poste !");
+	}
+
+	// autrement, on demande l'autorisation à l'utilisateur d'utiliser ce service //
+	// la fenêtre qui apparait pour valider la demande dépend du navigateur utilisé //
+	else if (Notification.permission !== "denied") {
+		const permission = await Notification.requestPermission();
+
+		// on envoie enfin la notification de test//
+		if (permission === "granted") {
+			const notification = new Notification("Ceci est une notification !");
+		}
+	}
+});
+```
+
+Maintenant, on peut, selon les besoins, créer de nouvelles notifications.
+Ici je confirme la création d'un nouveau film depuis <code>db.js</code> et envoie une notification uniquement si l'utilisateur à déjà accépté d'en recevoir :
+
+```js
+// lorsque le formulaire est validé //
+document
+	.querySelector("#addFilmForm")
+	.addEventListener("submit", async (event) => {
+		event.preventDefault();
+
+		// ... on récupère les valeurs du formulaire poyur créer l'objet film //
+
+		try {
+			// ... on envoie la requête pour persister nos données ... //
+
+			// si cela fonctionne, on envoie une notification //
+			if (Notification.permission === "granted") {
+				const notification = new Notification(
+					`Le film ${film.title} a bien été enregistré !`
+				);
+			}
+		} catch (error) {
+			// echec de la requête //
+			alert("L'enregistrement du film a échoué !");
+		}
+
+		// ... suite du traitement du formulaire ... //
+	});
+```
+
+### Notifications push
+
+La notification push est une fonctionnalité permettant à une application de recevoir des notifications sur l'appareil du client même lorsque celui ci n'est pas actif.
+On pourra ainsi tenir ce dernier informé lors de la réception d'un message, d'un mise à jour importante, ...
+
+Les notifications seront envoyées depuis un serveur (Firebase, Node JS, ...).
+Il est necessaire que l'utilisateur ai accépté de recevoir les notifications sur son appareil (cf. chapitre précédent), qu'un service worker soit activé et que ce dernier soit abonné au service de notifications du serveur.
+
+<code>app.js</code>
+
+```js
+if ("serviceWorker" in navigator) {
+	// ... enregistrement du service worker ...//
+
+	// on vérifie si l'application est abonnéeau service de notification //
+	const subscription = await registration.pushManager.getSubscription();
+
+	// si ce n'est pas le cas on l'enregistre //
+	if (!subscription) {
+		const subscription = await registration.pushManager.subscribe({
+			userVisibleOnly: true,
+			// on utilise ici une clef au format VAPID //
+			applicationServerKey: "...",
+		});
+	}
+
+	// il faut ensuite enregistrer l'abonnement sur le serveur //
+	await fetch("url_service_notification_du_serveur", {
+		method: "post",
+		headers: {
+			"Content-Type": "application/json",
+			"Accept": "application/json",
+		},
+		body: JSON.stringify(subscription),
+	});
+}
+```
+
+Nous pouvons maintenant recevoir des notifications depuis le serveur, le service worker les intercèpte gràce à l'événement <code>"push"</code> :
+
+<code>sw.js</code>
+
+```js
+// on intercepte la notification pish envoyée depuis le serveur //
+self.addEventListener("push", (event) => {
+	const data = event.data ? event.data.json() : {};
+	// on emet une notification en fonction des données reçues //
+	event.waitUntil(self.registration.showNotification(data.title, data));
+});
+```
+
+Cette fonction est encore experimentale est n'est pas prise en compte par tous les navigateurs.

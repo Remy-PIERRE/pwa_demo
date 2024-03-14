@@ -37,7 +37,14 @@ body {
 	font-weight: bold;
 }
 
-.header--add {
+.header--buttons {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
+.header--add,
+.header--notif {
 	height: 40px;
 	width: auto;
 }
@@ -115,4 +122,78 @@ body {
 .film--del img {
 	height: 28px;
 	width: auto;
+}
+
+.addFilm--container {
+	position: fixed;
+	width: 100vw;
+	top: 0;
+	right: -100%;
+	height: 100vh;
+	transition: all 0.4s;
+	z-index: 1;
+}
+
+.addFilm--container.opened {
+	right: 0;
+}
+
+.addFilm--wrapper {
+	width: 70%;
+	height: 100%;
+	padding: 20px;
+	margin-left: auto;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.addFilm--title {
+	font-size: 1.6rem;
+	font-weight: bold;
+	color: #333;
+	margin-bottom: 40px;
+	text-align: center;
+}
+
+.addFilm--form {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+}
+
+.form--section {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.form--section label {
+	font-size: 1rem;
+	color: #666;
+}
+
+.form--section input {
+	height: 40px;
+	width: 100%;
+	padding: 0 12px;
+	outline: none;
+	border: 2px outser #333;
+	border-radius: 4px;
+	font-size: 1.2rem;
+	color: #333;
+}
+
+.addFilm--submit {
+	height: 40px;
+	width: fit-content;
+	padding: 0 32px;
+	border: 2px outser #333;
+	border-radius: 4px;
+	font-size: 1.2rem;
+	color: #333;
+	margin: auto;
+	margin-top: 20px;
 }
